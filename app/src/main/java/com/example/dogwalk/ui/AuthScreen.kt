@@ -12,6 +12,11 @@ import com.example.dogwalk.viewmodel.AuthViewModel
 
 @Composable
 fun AuthScreen(viewModel: AuthViewModel = AuthViewModel()) {
+    var dogName by remember { mutableStateOf("") }
+    var ownerEmail by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var authMessage by remember { mutableStateOf<String?>(null) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -27,8 +32,11 @@ fun AuthScreen(viewModel: AuthViewModel = AuthViewModel()) {
 
         if (viewModel.isRegistering) {
             OutlinedTextField(
-                value = viewModel.dogName,
-                onValueChange = { viewModel.onDogNameChange(it) },
+                value = dogName,
+                onValueChange = {
+                    dogName = it
+                    viewModel.onDogNameChange(it)
+                },
                 label = { Text("Imię psa") },
                 modifier = Modifier.fillMaxWidth()
             )
@@ -36,8 +44,11 @@ fun AuthScreen(viewModel: AuthViewModel = AuthViewModel()) {
         }
 
         OutlinedTextField(
-            value = viewModel.ownerEmail,
-            onValueChange = { viewModel.onOwnerEmailChange(it) },
+            value = ownerEmail,
+            onValueChange = {
+                ownerEmail = it
+                viewModel.onOwnerEmailChange(it)
+            },
             label = { Text("Email właściciela") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth()
@@ -46,8 +57,11 @@ fun AuthScreen(viewModel: AuthViewModel = AuthViewModel()) {
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
-            value = viewModel.password,
-            onValueChange = { viewModel.onPasswordChange(it) },
+            value = password,
+            onValueChange = {
+                password = it
+                viewModel.onPasswordChange(it)
+            },
             label = { Text("Hasło") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             modifier = Modifier.fillMaxWidth()
@@ -56,10 +70,22 @@ fun AuthScreen(viewModel: AuthViewModel = AuthViewModel()) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { viewModel.onSubmit() },
+            onClick = {
+                viewModel.onSubmit { success, message ->
+                    authMessage = message
+                }
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(if (viewModel.isRegistering) "Zarejestruj się" else "Zaloguj się")
+        }
+
+        if (authMessage != null) {
+            Text(
+                text = authMessage!!,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(top = 8.dp)
+            )
         }
 
         Spacer(modifier = Modifier.height(8.dp))
